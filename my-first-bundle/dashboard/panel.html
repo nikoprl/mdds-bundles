@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      #speakerPanel-container {
+        margin: 25px;
+      }
+
+      #speakerForm {
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+
+      input#speaker,
+      input#title {
+        margin-top: 3px;
+        width: 100%;
+      }
+
+      #change-button {
+        background-color: rgb(5, 120, 57);
+        border: 1px solid rgb(80, 165, 83);
+        width: 100%;
+      }
+
+      #showhide {
+        background-color: rgb(102, 97, 100);
+        border: 1px solid rgb(147, 133, 133);
+        width: 100%;
+      }
+
+      button {
+        padding: 5px;
+        border-radius: 5px;
+        color: white;
+      }
+
+      button:hover {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.096) 0 0);
+      }
+
+      button:active {
+        background-image: linear-gradient(rgb(0 0 0/20%) 0 0);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="speakerPanel-container">
+      <form id="speakerForm" autocomplete="off">
+        <label for="speaker">Puhujan nimi:</label>
+        <input type="text" id="speaker" />
+        <br />
+        <br />
+        <label for="title">Puhujan titteli:</label>
+        <input type="text" id="title" />
+        <br />
+        <br />
+        <button id="change-button" type="submit">Vaihda</button>
+      </form>
+      <br />
+      <button id="showhide">NÄYTÄ/PIILOTA</button>
+    </div>
+
+    <script>
+      const speakerRep = nodecg.Replicant("puhujaReplicant");
+      const visibilRep = nodecg.Replicant("visiblReplicant");
+
+      NodeCG.waitForReplicants(speakerRep, visibilRep).then(() => {
+        const speaker = document.getElementById("speaker");
+        const title = document.getElementById("title");
+
+        /* Update speaker */
+        document
+          .querySelector("#speakerForm")
+          .addEventListener("submit", (e) => {
+            e.preventDefault;
+            speakerRep.value.name = speaker.value;
+            speakerRep.value.title = title.value;
+            console.log("Speaker: ", speaker.value);
+            console.log("Title: ", title.value);
+          });
+
+        speakerRep.on("change", (newValue) => {
+          if (typeof newValue !== undefined) {
+            speaker.value = newValue.name;
+            title.value = newValue.title;
+          } else {
+            console.log("newValue was undefined");
+          }
+        });
+
+        /* Show/hide element on button click */
+        let isVisible = visibilRep.value.visibility;
+
+        document.querySelector("#showhide").addEventListener("click", (e) => {
+          isVisible = !isVisible;
+          visibilRep.value.visibility = isVisible;
+        });
+
+        visibilRep.on("change", (newValue) => {
+          if (typeof newValue !== undefined) {
+            visibilRep.value.visibility = newValue.visibility;
+            console.log("visibility:", newValue.visibility);
+          } else {
+            console.log("newValue was undefined");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

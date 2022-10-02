@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titan+One">
+    <style>
+      body {
+        font-family: 'Titan One';
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-end;
+        overflow: hidden;
+        height: 100vh;
+      }
+
+      #main-container {
+        position: relative;
+        bottom: 25px;
+        left: 15px;
+        transform: scale(0.44);
+        animation: scale 3s forwards;
+      }
+
+      #speaker-container {
+        background: #35383c;
+        box-shadow: inset 8px 8px 6px #131d27, inset -8px -8px 6px #4f5760;
+        color: white;
+        font-size: 30px;
+        padding: 15px;
+        display: block;
+        min-width: 289px;
+		border: 1px solid aliceblue;
+        border-radius: 10px;
+      }
+
+      #puhuja {
+        margin-left: 15px;
+        animation: fade-in-right 1s;
+      }
+
+      #titteli {
+        margin-left: 15px;
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		font-size: 18px;
+        font-style: italic;
+        font-weight: bolder;
+        animation: fade-in-left 1s;
+		color: #b6a1d5;
+      }
+
+      @keyframes fade-in-right {
+        from {
+          opacity: 0;
+          transform: translateX(-55px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes fade-in-left {
+        from {
+          opacity: 0;
+          transform: translateX(55px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes scale {
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .glow::before {
+        content: "";
+        left: -4px;
+        top: -4px;
+        position: absolute;
+        overflow: hidden;
+        background: linear-gradient(
+          65deg,
+		  #44cf6c,
+          #ff6600d9,
+          #bdd3c6,
+          #13ff13,
+          #27a6ad,
+          #e22797,
+          #7b4b94,
+          #bfff00de,
+          #5aabde
+        );
+        background-size: 425%;
+        width: calc(100% + 8px);
+        height: calc(100% + 8px);
+        z-index: -5;
+        animation: glower 19s linear infinite;
+        border-radius: 13px;
+      }
+
+      @keyframes glower {
+        0% {
+          background-position: 0 0;
+        }
+
+        50% {
+          background-position: 400% 0;
+        }
+
+        100% {
+          background-position: 0 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="main-container">
+      <div id="speaker-container" class="glow">
+        <div id="puhuja" class="animated">&nbsp;</div>
+        <div id="titteli" class="animated">&nbsp;</div>
+      </div>
+    </div>
+    <script>
+      const speakerRep = nodecg.Replicant("puhujaReplicant");
+      const visibilRep = nodecg.Replicant("visiblReplicant");
+      const puhuja = document.getElementById("puhuja");
+      const titteli = document.getElementById("titteli");
+      const anim = document.getElementsByClassName("animated");
+
+      NodeCG.waitForReplicants(speakerRep, visibilRep).then(() => {
+        speakerRep.on("change", (newValue) => {
+          if (typeof newValue !== undefined) {
+
+            /* Update values */
+            puhuja.innerHTML = newValue.name;
+            titteli.innerHTML = newValue.title;
+
+            /* Retrigger animation */
+            for (let i = 0; i < anim.length; i++) {
+              anim[i].style.animation = "none";
+              anim[i].offsetHeight;
+              anim[i].style.animation = null;
+            }
+
+          } else {
+            console.log("newValue was undefined");
+          }
+        });
+
+        visibilRep.on("change", (newValue) => {
+          if (typeof newValue !== undefined) {
+            if (newValue.visibility == true) {
+              document.body.style.display = "flex";
+            } else {
+              document.body.style.display = "none";
+            }
+          } else {
+            console.log("newValue was undefined");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
